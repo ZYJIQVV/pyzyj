@@ -12,7 +12,7 @@ import cv2
 import os
 import json
 import numpy as np
-from .format import xml_parser
+from .format import xml_parser, yolo_parser
 
 
 def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple = None, parser: callable = None, format: str='yolo') -> None:
@@ -69,20 +69,13 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
     elif ann_path.endswith('.txt'):
         if format == 'yolo':  # yolo
             img = cv2.imread(img_path)
-            with open(ann_path, 'r') as f:
-                lines = f.readlines()
-                for line in lines:
-                    line = line.strip().split(' ')
-                    x_center = float(line[1])
-                    y_center = float(line[2])
-                    w = float(line[3])
-                    h = float(line[4])
-                    img_h, img_w, _ = img.shape
-                    x = int((x_center - w / 2) * img_w)
-                    y = int((y_center - h / 2) * img_h)
-                    x2 = int((x_center + w / 2) * img_w)
-                    y2 = int((y_center + h / 2) * img_h)
-                    cv2.rectangle(img, (x, y), (x2, y2), color, 2)
+            img_h, img_w, _ = img.shape
+            bboxes = yolo_parser(ann_path, img_w, img_h)
+            for bbox in bboxes:
+                bbox = bbox['bbox']
+                xmin, ymin, xmax, ymax = bbox
+                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
+
         elif format == 'custom':
             if parser is None:
                 raise Exception('parser is None')

@@ -112,12 +112,13 @@ def coco_parser(ann_path):
 
     return {'images': images, 'categories': categories, 'img_ann_map': img_ann_map}
 
-def yolo_parser(yolo_path,img_w=None,img_h=None):
+
+def yolo_parser(yolo_path, img_w=None, img_h=None):
     """
-    return bboxes [{'name':name,'bbox':[xmin,ymin,xmax,ymax]},...]
-    :param ann_path:
-    :img_w: image width
-    :img_h: image height
+    return bboxes [{'name':name,'bbox':[xmin,ymin,xmax,ymax]},...] or [{'name':name,'bbox':[cx,cy,w,h]},...]
+    :param yolo_path:
+    :param img_w: image width
+    :param img_h: image height
     if img_w and img_h are not None, the bbox will be scaled to the original image size,
     otherwise the bbox is the relative size
     :return:
@@ -143,6 +144,7 @@ def yolo_parser(yolo_path,img_w=None,img_h=None):
             else:
                 bboxes.append({'name': cat, 'bbox': [cx, cy, w, h]})
     return bboxes
+
 
 def xml_parser(ann_path):
     '''
