@@ -80,10 +80,10 @@ def yolo_to_coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0,
                         y *= height
                         w *= width
                         h *= height
-                        x += w / 2
-                        y += h / 2
+                        xmin = int(x - w / 2)
+                        ymin = int(y - h / 2)
                         cat = int(cat)
-                        bbox = [x, y, w, h]
+                        bbox = [xmin, ymin, w, h]
                         ann_id += 1
                         ann = {'id': ann_id, 'image_id': img_id, 'category_id': cat, 'bbox': bbox}
                         annotations.append(ann)
