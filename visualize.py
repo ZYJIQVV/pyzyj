@@ -46,14 +46,12 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
         for ann_ann in ann['annotations']:
             if ann_ann['image_id'] == img_id:
                 bbox = ann_ann['bbox']
-                cx = bbox[0]
-                cy = bbox[1]
+                xmin = (bbox[0])
+                ymin = bbox[1]
                 w = bbox[2]
                 h = bbox[3]
-                xmin = int(cx - w / 2)
-                ymin = int(cy - h / 2)
-                xmax = int(cx + w / 2)
-                ymax = int(cy + h / 2)
+                xmax = xmin + w
+                ymax = ymin + h
                 cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
     elif ann_path.endswith('.xml'):  # voc
         if parser is None:
