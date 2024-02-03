@@ -10,7 +10,7 @@
 import requests
 
 
-def get(url, file, mode):
+def get(url, file, mode='wb'):
     """
     Given a URL, this function will download the content and save it to the specified location as the specified format.
     :param url: the URL of the content to be downloaded
