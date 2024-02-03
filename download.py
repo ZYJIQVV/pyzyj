@@ -11,6 +11,13 @@ import requests
 
 
 def get(url, file, mode):
+    """
+    Given a URL, this function will download the content and save it to the specified location as the specified format.
+    :param url: the URL of the content to be downloaded
+    :param file: the location where the content will be saved, including the file name and extension name
+    :param mode: the format of the content to be saved, 'wb' for binary file and 'w' for text file
+    :return: None
+    """
     response = requests.get(url)
     if mode == 'wb':
         with open(file, mode) as f:
