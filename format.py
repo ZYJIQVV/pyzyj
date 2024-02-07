@@ -25,8 +25,9 @@ def coco_to_yolo(json_path, yolo_root, cat_reid=False):
         img_ann_map[img['id']] = []
     for ann in annotations:
         img_ann_map[ann['image_id']].append(ann)
+    file_name_key = 'file_name' if 'file_name' in images[0] else 'filename'
     for img in images:
-        img_name = img['file_name']
+        img_name = img[file_name_key]
         img_width = img['width']
         img_height = img['height']
         img_id = img['id']

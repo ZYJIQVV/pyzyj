@@ -37,8 +37,9 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
         coco = COCO(ann_path)
         imgs = coco.imgs
         img_id = None
+        file_name_key = 'file_name' if 'file_name' in imgs[coco.getImgIds()[0]] else 'filename'
         for img in imgs.values():
-            if img['file_name'] == filename:
+            if img[file_name_key] == filename:
                 img_id = img['id']
                 break
         img = cv2.imread(img_path)
