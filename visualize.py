@@ -13,7 +13,7 @@ import os
 import json
 import numpy as np
 from .format import xml_parser, yolo_parser
-
+from pycocotools.coco import COCO
 
 def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple = None, parser: callable = None, format: str='yolo') -> None:
     """
@@ -33,26 +33,31 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
     if color is None:
         color = (0, 0, 255)
     if ann_path.endswith('.json'):  # coco
-        ann = json.load(open(ann_path, 'r'))
-        img = cv2.imread(img_path)
         filename = os.path.basename(img_path)
+        coco = COCO(ann_path)
+        imgs = coco.imgs
         img_id = None
-        for ann_img in ann['images']:
-            if ann_img['file_name'] == filename:
-                img_id = ann_img['id']
+        for img in imgs.values():
+            if img['file_name'] == filename:
+                img_id = img['id']
                 break
+        img = cv2.imread(img_path)
         if img_id is None:
             raise Exception('Image not found in ann file')
-        for ann_ann in ann['annotations']:
-            if ann_ann['image_id'] == img_id:
-                bbox = ann_ann['bbox']
-                xmin = (bbox[0])
-                ymin = bbox[1]
-                w = bbox[2]
-                h = bbox[3]
-                xmax = xmin + w
-                ymax = ymin + h
-                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
+        for ann_ann in coco.loadAnns(coco.getAnnIds(imgIds=img_id)): # coco.loadAnns(4635)
+            bbox = ann_ann['bbox']
+            xmin = (bbox[0])
+            ymin = bbox[1]
+            w = bbox[2]
+            h = bbox[3]
+            xmax = xmin + w
+            ymax = ymin + h
+            xmin = int(xmin)
+            ymin = int(ymin)
+            xmax = int(xmax)
+            ymax = int(ymax)
+            cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
+
     elif ann_path.endswith('.xml'):  # voc
         if parser is None:
             raise Exception('parser is None')
