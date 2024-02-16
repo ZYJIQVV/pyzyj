@@ -45,7 +45,10 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
         img = cv2.imread(img_path)
         if img_id is None:
             raise Exception('Image not found in ann file')
-        for ann_ann in coco.loadAnns(coco.getAnnIds(imgIds=img_id)): # coco.loadAnns(4635)
+        anns = coco.loadAnns(coco.getAnnIds(imgIds=img_id)) # coco.loadAnns(4635)
+        if len(anns) == 0:
+            raise Exception('No bbox found in ann file')
+        for ann_ann in anns:
             bbox = ann_ann['bbox']
             xmin = (bbox[0])
             ymin = bbox[1]
@@ -64,6 +67,8 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
             raise Exception('parser is None')
         img = cv2.imread(img_path)
         bboxes = parser(ann_path)
+        if len(bboxes) == 0:
+            raise Exception('No bbox found in ann file')
         for bbox in bboxes:
             if isinstance(bbox, dict):
                 bbox = bbox['bbox']
@@ -77,6 +82,8 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
             img = cv2.imread(img_path)
             img_h, img_w, _ = img.shape
             bboxes = yolo_parser(ann_path, img_w, img_h)
+            if len(bboxes) == 0:
+                raise Exception('No bbox found in ann file')
             for bbox in bboxes:
                 bbox = bbox['bbox']
                 xmin, ymin, xmax, ymax = bbox
@@ -87,6 +94,8 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
                 raise Exception('parser is None')
             img = cv2.imread(img_path)
             bboxes = parser(ann_path)
+            if len(bboxes) == 0:
+                raise Exception('No bbox found in ann file')
             for bbox in bboxes:
                 if isinstance(bbox, dict):
                     bbox = bbox['bbox']
