@@ -89,9 +89,9 @@ def coco_merge(*args):
     ann_id = 0
     merged_json, img_id, ann_id = __merge(json1, json2, img_id, ann_id)
     while json_cnt < len(args):
-        json_cnt += 1
         new_json = json.load(open(args[json_cnt], 'r'))
         merged_json, img_id, ann_id = __merge(merged_json, new_json, img_id, ann_id)
+        json_cnt += 1
     return merged_json
 
 
