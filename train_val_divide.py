@@ -80,6 +80,11 @@ def yolo_divide(total_lbl_root, total_img_root, yolo_root, train_ratio=0.8):
 
 
 def coco_merge(*args):
+    """
+    Merge multiple coco json files into one. All the json files should have the totally same categories.
+    :param args:
+    :return:
+    """
     coco_json1 = args[0]
     coco_json2 = args[1]
     json_cnt = 2
