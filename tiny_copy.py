@@ -197,8 +197,8 @@ def target_copy(img_path, ann_path, save_path, times=2, parser: callable = None,
 
 
 if __name__ == '__main__':
-    from pyzyj.format import yolo_parser
-    from pyzyj.visualize import visualize
+    from format import yolo_parser
+    from visualize import visualize
     #
     # img_path = r'F:\GD\dataset\coco128\images\train2017\000000000025.jpg'
     # ann_path = r'F:\GD\dataset\coco128\labels\train2017\000000000025.txt'
