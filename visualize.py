@@ -24,6 +24,9 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
     :param color: the color of bbox or mask
     :param parser: if ann_path is xml, parser is required, which is a callable function and returns a list of bbox
      like [{'name':name, 'bbox':[xmin,ymin,xmax,ymax]},...] or [[xmin,ymin,xmax,ymax],...].
+     It takes ann_path as input if the annotations for each image are in a seperate file respectively.,
+     or takes img_path and ann_path as input if the annotations for each image are all in one file,
+     and the parser should accept img_path as the first input and ann_path the second.
      A simple parser is provided in format.py
     :param format: the format of annotation file which should be in ['custom', 'yolo'].
      If format is 'custom', a  parser is needed which returns the same format as above.
@@ -32,36 +35,49 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
     img = None
     if color is None:
         color = (0, 0, 255)
-    if ann_path.endswith('.json'):  # coco
-        filename = os.path.basename(img_path)
-        coco = COCO(ann_path)
-        imgs = coco.imgs
-        img_id = None
-        file_name_key = 'file_name' if 'file_name' in imgs[coco.getImgIds()[0]] else 'filename'
-        for img in imgs.values():
-            if img[file_name_key] == filename:
-                img_id = img['id']
-                break
-        img = cv2.imread(img_path)
-        if img_id is None:
-            raise Exception('Image not found in ann file')
-        anns = coco.loadAnns(coco.getAnnIds(imgIds=img_id)) # coco.loadAnns(4635)
-        if len(anns) == 0:
-            raise Exception('No bbox found in ann file')
-        for ann_ann in anns:
-            bbox = ann_ann['bbox']
-            xmin = (bbox[0])
-            ymin = bbox[1]
-            w = bbox[2]
-            h = bbox[3]
-            xmax = xmin + w
-            ymax = ymin + h
-            xmin = int(xmin)
-            ymin = int(ymin)
-            xmax = int(xmax)
-            ymax = int(ymax)
-            cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
-
+    if ann_path.endswith('.json'):
+        if parser is None:  # coco
+            filename = os.path.basename(img_path)
+            coco = COCO(ann_path)
+            imgs = coco.imgs
+            img_id = None
+            file_name_key = 'file_name' if 'file_name' in imgs[coco.getImgIds()[0]] else 'filename'
+            for img in imgs.values():
+                if img[file_name_key] == filename:
+                    img_id = img['id']
+                    break
+            img = cv2.imread(img_path)
+            if img_id is None:
+                raise Exception('Image not found in ann file')
+            anns = coco.loadAnns(coco.getAnnIds(imgIds=img_id))  # coco.loadAnns(4635)
+            if len(anns) == 0:
+                raise Exception('No bbox found in ann file')
+            for ann_ann in anns:
+                bbox = ann_ann['bbox']
+                xmin = (bbox[0])
+                ymin = bbox[1]
+                w = bbox[2]
+                h = bbox[3]
+                xmax = xmin + w
+                ymax = ymin + h
+                xmin = int(xmin)
+                ymin = int(ymin)
+                xmax = int(xmax)
+                ymax = int(ymax)
+                cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
+        else:
+            bboxes = parser(img_path,ann_path)
+            img = cv2.imread(img_path)
+            if len(bboxes) == 0:
+                raise Exception('No bbox found in ann file')
+            for bbox in bboxes:
+                if isinstance(bbox, dict):
+                    bbox = bbox['bbox']
+                x = bbox[0]
+                y = bbox[1]
+                w = bbox[2]
+                h = bbox[3]
+                cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
     elif ann_path.endswith('.xml'):  # voc
         if parser is None:
             raise Exception('parser is None')
