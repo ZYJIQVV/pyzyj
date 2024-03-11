@@ -15,4 +15,5 @@ setup(
     install_requires=[
         # list your project dependencies here
     ],
+    long_description=open('README.md').read(),
 )
