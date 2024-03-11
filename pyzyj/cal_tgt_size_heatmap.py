@@ -10,7 +10,7 @@ import os
 from typing import Union
 
 import cv2
-from format import yolo_parser
+from format import yolo_parser, coco_parser
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from collections import Counter
@@ -46,10 +46,12 @@ def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/data
     return sizes, size_cnt_map, hw_pair
 
 
-def cal_tgt_size_dist(res='c', *, yolo_root=None, format='yolo'):
+def cal_tgt_size_dist(*,res='c', yolo_root=None, coco_root=None, format='yolo'):
     """
-    :param res: If res is set to 'c', return the size_cnt_map, else return the sizes list, size cnt map, hieght width pair
+    :param res: If res is set to 'c', return the size_cnt_map,
+    else return the sizes list, size cnt map, hieght width pair
     :param yolo_root:
+    :param coco_root:
     :param format:
     :return:
     """
@@ -60,12 +62,13 @@ def cal_tgt_size_dist(res='c', *, yolo_root=None, format='yolo'):
         sizes, size_cnt_map, hw_pair = yolo_cal_tgt_size_dist(yolo_root)
     elif format == 'coco':
         raise NotImplementedError
-    if res == 'd':
+    if res == 'c':
         return size_cnt_map
     return sizes, size_cnt_map, hw_pair
 
 
-def gen_heatmap(base=None, filename='heatmap.png', threshold: Union[list, tuple, int, float] = 100):
+def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
+                filename='heatmap.png', threshold: Union[list, tuple, int, float] = 100):
     """
     :param base: If base is not None, the width and height will be rounded
     to the maximum multiple of base less than the original width and height
@@ -73,7 +76,15 @@ def gen_heatmap(base=None, filename='heatmap.png', threshold: Union[list, tuple,
     :param threshold: The maximum width and height to be shown in the heatmap
     :return:
     """
-    _, _, hw_pair = cal_tgt_size_dist()
+    format = 'yolo'
+    if yolo_root is None and coco_root is None:
+        raise ValueError('yolo_root and coco_root cannot be both None')
+    if yolo_root is not None and coco_root is not None:
+        raise ValueError('yolo_root and coco_root cannot be both not None')
+    if yolo_root is not None:
+        _, _, hw_pair = cal_tgt_size_dist(res=res,yolo_root=yolo_root, format=format)
+    else:
+        _, _, hw_pair = cal_tgt_size_dist(coco_root=coco_root, format=format)
     # hw_pair = hw_pair[:100]
     h_threshold = 100
     w_threshold = 100
