@@ -19,14 +19,11 @@ import seaborn as sb
 import pandas as pd
 
 
-def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/dataset/3x3'):
-    size_cnt_map = {}
-    sizes = []
-    hw_pair = []
-    for t in ['train', 'test']:
-        img_root = fr'{yolo_root}/images/{t}'
-        imgs = os.listdir(img_root)
-        lbl_root = fr'{yolo_root}/labels/{t}'
+def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/dataset/3x3',s=None):
+    def __get_sizes(imgs, img_root, lbl_root):
+        size_cnt_map = {}
+        sizes = []
+        hw_pair = []
         for img in imgs:
             img_path = fr'{img_root}/{img}'
             lbl_path = fr'{lbl_root}/{img.replace("jpg", "txt")}'
@@ -43,10 +40,48 @@ def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/data
                 bw = int(box[2] * w)
                 bh = int(box[3] * h)
                 hw_pair.append((bh, bw))
+        return sizes, size_cnt_map, hw_pair
+
+    has_train = 'train' in os.listdir(f'{yolo_root}/images') and 'train' in os.listdir(f'{yolo_root}/labels')
+    has_test = 'test' in os.listdir(f'{yolo_root}/images') and 'test' in os.listdir(f'{yolo_root}/labels')
+    if not has_train and not has_test:
+        raise ValueError('No train or test set found')
+    if s is not None:
+        img_root = fr'{yolo_root}/images/{s}'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/{s}'
+        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+    elif not has_train:
+        img_root = fr'{yolo_root}/images/test'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/test'
+        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+    elif not has_test:
+        img_root = fr'{yolo_root}/images/train'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/train'
+        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+    else:
+        img_root = fr'{yolo_root}/images/train'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/train'
+        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+        img_root = fr'{yolo_root}/images/test'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/test'
+        sizes_, size_cnt_map_, hw_pair_ = __get_sizes(imgs, img_root, lbl_root)
+        sizes.extend(sizes_)
+        for k, v in size_cnt_map_.items():
+            if k not in size_cnt_map:
+                size_cnt_map[k] = 0
+            size_cnt_map[k] += v
+        hw_pair.extend(hw_pair_)
     return sizes, size_cnt_map, hw_pair
 
 
-def cal_tgt_size_dist(*,res='c', yolo_root=None, coco_root=None, format='yolo'):
+
+
+def cal_tgt_size_dist(*,res='c', yolo_root=None, coco_root=None, format='yolo',s=None):
     """
     :param res: If res is set to 'c', return the size_cnt_map,
     else return the sizes list, size cnt map, hieght width pair
@@ -55,11 +90,8 @@ def cal_tgt_size_dist(*,res='c', yolo_root=None, coco_root=None, format='yolo'):
     :param format:
     :return:
     """
-    size_cnt_map = {}
-    sizes = []
-    hw_pair = []
     if format == 'yolo':
-        sizes, size_cnt_map, hw_pair = yolo_cal_tgt_size_dist(yolo_root)
+        sizes, size_cnt_map, hw_pair = yolo_cal_tgt_size_dist(yolo_root,s)
     elif format == 'coco':
         raise NotImplementedError
     if res == 'c':
@@ -68,7 +100,7 @@ def cal_tgt_size_dist(*,res='c', yolo_root=None, coco_root=None, format='yolo'):
 
 
 def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
-                filename='heatmap.png', threshold: Union[list, tuple, int, float] = 100):
+                filename='heatmap.png', threshold: Union[list, tuple, int, float] = 100,s=None):
     """
     :param base: If base is not None, the width and height will be rounded
     to the maximum multiple of base less than the original width and height
@@ -83,9 +115,9 @@ def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
     if yolo_root is not None and coco_root is not None:
         raise ValueError('yolo_root and coco_root cannot be both not None')
     if yolo_root is not None:
-        _, _, hw_pair = cal_tgt_size_dist(res=res,yolo_root=yolo_root, format=format)
+        _, _, hw_pair = cal_tgt_size_dist(res=res,yolo_root=yolo_root, format=format,s=s)
     else:
-        _, _, hw_pair = cal_tgt_size_dist(coco_root=coco_root, format=format)
+        _, _, hw_pair = cal_tgt_size_dist(coco_root=coco_root, format=format,s=s)
     # hw_pair = hw_pair[:100]
     h_threshold = 100
     w_threshold = 100
