@@ -76,6 +76,7 @@ def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
     :param threshold: The maximum width and height to be shown in the heatmap
     :return:
     """
+
     format = 'yolo'
     if yolo_root is None and coco_root is None:
         raise ValueError('yolo_root and coco_root cannot be both None')
