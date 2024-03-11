@@ -212,7 +212,7 @@ if __name__ == '__main__':
     # img_path = r'F:\GD\dataset\HIT-UAV\images\train\0_60_30_0_01611.jpg'
     ann_path = r'F:\GD\dataset\UAVDT\annotations\M0101.json'
     img_path = r'F:\GD\dataset\UAVDT\images\M0101-img000008.jpg'
-    save_path = r'.'
-    target_copy(img_path, ann_path, '.', times=4, data_format='coco', copy_type='img',new_img_size=-2)
+    save_path = r'..'
+    target_copy(img_path, ann_path, '..', times=4, data_format='coco', copy_type='img', new_img_size=-2)
     visualize('M0101-img000008.jpg', 'M0101-img000008.json')
     # visualize(img_path, ann_path)
