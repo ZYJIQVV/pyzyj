@@ -16,4 +16,5 @@ setup(
         # list your project dependencies here
     ],
     long_description=open('README.md').read(),
+    long_description_content_type='text/markdown',
 )
