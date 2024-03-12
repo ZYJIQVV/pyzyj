@@ -6,7 +6,6 @@
 @IDE: PyCharm
 @Motto: xhxgg
 """
-
 import requests
 
 

@@ -44,38 +44,101 @@ def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/data
 
     has_train = 'train' in os.listdir(f'{yolo_root}/images') and 'train' in os.listdir(f'{yolo_root}/labels')
     has_test = 'test' in os.listdir(f'{yolo_root}/images') and 'test' in os.listdir(f'{yolo_root}/labels')
-    if not has_train and not has_test:
+    has_val = 'val' in os.listdir(f'{yolo_root}/images') and 'val' in os.listdir(f'{yolo_root}/labels')
+    if not has_train and not has_test and not has_val:
         raise ValueError('No train or test set found')
     if s is not None:
         img_root = fr'{yolo_root}/images/{s}'
         imgs = os.listdir(img_root)
         lbl_root = fr'{yolo_root}/labels/{s}'
         sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
-    elif not has_train:
+    elif not has_train and not has_val:
         img_root = fr'{yolo_root}/images/test'
         imgs = os.listdir(img_root)
         lbl_root = fr'{yolo_root}/labels/test'
         sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+    elif not has_test and not has_val:
+        img_root = fr'{yolo_root}/images/train'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/train'
+        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+    elif not has_test and not has_train:
+        img_root = fr'{yolo_root}/images/val'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/val'
+        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+    elif not has_val:
+        img_root = fr'{yolo_root}/images/train'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/train'
+        sizes_train, size_cnt_map_train, hw_pair_train = __get_sizes(imgs, img_root, lbl_root)
+        img_root = fr'{yolo_root}/images/test'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/test'
+        sizes_test, size_cnt_map_test, hw_pair_test = __get_sizes(imgs, img_root, lbl_root)
+        sizes = sizes_train + sizes_test
+        size_cnt_map = size_cnt_map_train
+        for k, v in size_cnt_map_test.items():
+            if k not in size_cnt_map:
+                size_cnt_map[k] = 0
+            size_cnt_map[k] += v
+        hw_pair = hw_pair_train + hw_pair_test
     elif not has_test:
         img_root = fr'{yolo_root}/images/train'
         imgs = os.listdir(img_root)
         lbl_root = fr'{yolo_root}/labels/train'
-        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+        sizes_train, size_cnt_map_train, hw_pair_train = __get_sizes(imgs, img_root, lbl_root)
+        img_root = fr'{yolo_root}/images/val'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/val'
+        sizes_val, size_cnt_map_val, hw_pair_val = __get_sizes(imgs, img_root, lbl_root)
+        sizes = sizes_train + sizes_val
+        size_cnt_map = size_cnt_map_train
+        for k, v in size_cnt_map_val.items():
+            if k not in size_cnt_map:
+                size_cnt_map[k] = 0
+            size_cnt_map[k] += v
+        hw_pair = hw_pair_train + hw_pair_val
+    elif not has_train:
+        img_root = fr'{yolo_root}/images/test'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/test'
+        sizes_test, size_cnt_map_test, hw_pair_test = __get_sizes(imgs, img_root, lbl_root)
+        img_root = fr'{yolo_root}/images/val'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/val'
+        sizes_val, size_cnt_map_val, hw_pair_val = __get_sizes(imgs, img_root, lbl_root)
+        sizes = sizes_test + sizes_val
+        size_cnt_map = size_cnt_map_test
+        for k, v in size_cnt_map_val.items():
+            if k not in size_cnt_map:
+                size_cnt_map[k] = 0
+            size_cnt_map[k] += v
+        hw_pair = hw_pair_test + hw_pair_val
     else:
         img_root = fr'{yolo_root}/images/train'
         imgs = os.listdir(img_root)
         lbl_root = fr'{yolo_root}/labels/train'
-        sizes, size_cnt_map, hw_pair = __get_sizes(imgs, img_root, lbl_root)
+        sizes_train, size_cnt_map_train, hw_pair_train = __get_sizes(imgs, img_root, lbl_root)
         img_root = fr'{yolo_root}/images/test'
         imgs = os.listdir(img_root)
         lbl_root = fr'{yolo_root}/labels/test'
-        sizes_, size_cnt_map_, hw_pair_ = __get_sizes(imgs, img_root, lbl_root)
-        sizes.extend(sizes_)
-        for k, v in size_cnt_map_.items():
+        sizes_test, size_cnt_map_test, hw_pair_test = __get_sizes(imgs, img_root, lbl_root)
+        img_root = fr'{yolo_root}/images/val'
+        imgs = os.listdir(img_root)
+        lbl_root = fr'{yolo_root}/labels/val'
+        sizes_val, size_cnt_map_val, hw_pair_val = __get_sizes(imgs, img_root, lbl_root)
+        sizes = sizes_train + sizes_test + sizes_val
+        size_cnt_map = size_cnt_map_train
+        for k, v in size_cnt_map_test.items():
             if k not in size_cnt_map:
                 size_cnt_map[k] = 0
             size_cnt_map[k] += v
-        hw_pair.extend(hw_pair_)
+        for k, v in size_cnt_map_val.items():
+            if k not in size_cnt_map:
+                size_cnt_map[k] = 0
+            size_cnt_map[k] += v
+        hw_pair = hw_pair_train + hw_pair_test + hw_pair_val
     return sizes, size_cnt_map, hw_pair
 
 
