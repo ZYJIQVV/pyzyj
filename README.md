@@ -7,5 +7,4 @@ I have decided to publish it as a package on PyPI and GitHub so that it can be i
 These tools are currently mainly used for data processing, data analysis, and data visualization.
 It will continue to be updated in the future.
 
-
-update.py may have to run under admin permission.
+update.py may have to run under admin permission. It can run in a cmd terminal or in a python environment with admin permission.
