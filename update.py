@@ -17,7 +17,7 @@ def replace_pip(python_root=r'C:\Users\lenovo\AppData\Roaming\Python'):
     python_interpreters = [d for d in os.listdir(python_root) if re.match(r'Python\d+', d)]
     for pi in python_interpreters:
         pi_path = fr'{python_root}\{pi}\site-packages'
-        # print(pi_path)
+        print(pi_path)
         # replace the old pyzyj code with the new one
         old_pyzyj = fr'{pi_path}\pyzyj'
         if os.path.exists(old_pyzyj):
@@ -39,6 +39,7 @@ def replace_conda(conda_root=r'F:\D\ProgramData\Anaconda3'):
             backup_pyzyj = fr'{env_path}\pyzyj_backup'
             if os.path.exists(backup_pyzyj):
                 shutil.rmtree(backup_pyzyj)
+                print(f'remove {backup_pyzyj}')
             shutil.move(old_pyzyj, backup_pyzyj)
         shutil.copytree(pyzyj_root, old_pyzyj)
 
@@ -48,12 +49,10 @@ if __name__ == '__main__':
     # python update.py -c conda_root means call the function replace_conda
     # it must be called as python update.py -p pip_root or python update.py -c conda_root
     parser = argparse.ArgumentParser()
-    parser.add_argument('-p', '--pip_root', help='the root of pip')
-    parser.add_argument('-c', '--conda_root', help='the root of conda')
+    parser.add_argument('-p', '--pip_root', help='the root of pip', default=r'C:\Users\lenovo\AppData\Roaming\Python')
+    parser.add_argument('-c', '--conda_root', help='the root of conda', default=r'F:\D\ProgramData\Anaconda3')
     args = parser.parse_args()
     if args.pip_root:
         replace_pip(args.pip_root)
-    elif args.conda_root:
+    if args.conda_root:
         replace_conda(args.conda_root)
-    else:
-        raise ValueError('Invalid arguments')

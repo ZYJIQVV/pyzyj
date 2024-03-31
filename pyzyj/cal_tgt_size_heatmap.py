@@ -10,7 +10,7 @@ import os
 from typing import Union
 
 import cv2
-from format import yolo_parser, coco_parser
+from format import yolo_parser, coco_parser, yolo_obb_parser
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from collections import Counter
@@ -19,27 +19,47 @@ import seaborn as sb
 import pandas as pd
 
 
-def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/dataset/3x3',s=None):
-    def __get_sizes(imgs, img_root, lbl_root):
+def yolo_cal_tgt_size_dist(yolo_root=r'/data/ll/code/sod/YOLOv8_With_ODConv/dataset/3x3',s=None, box_format='hbb'):
+    def __get_sizes(imgs, img_root, lbl_root, box_format='hbb'):
         size_cnt_map = {}
         sizes = []
         hw_pair = []
-        for img in imgs:
-            img_path = fr'{img_root}/{img}'
-            lbl_path = fr'{lbl_root}/{img.replace("jpg", "txt")}'
-            img = cv2.imread(img_path)
-            h, w, _ = img.shape
-            boxes = yolo_parser(lbl_path)
-            for nb in boxes:
-                box = nb['bbox']
-                size = int(box[2] * box[3] * w * h)
-                if size not in size_cnt_map:
-                    size_cnt_map[size] = 0
-                size_cnt_map[size] += 1
-                sizes.append(size)
-                bw = int(box[2] * w)
-                bh = int(box[3] * h)
-                hw_pair.append((bh, bw))
+        if box_format == 'hbb':
+            for img in imgs:
+                img_path = fr'{img_root}/{img}'
+                lbl_path = fr'{lbl_root}/{img.replace("jpg", "txt")}'
+                img = cv2.imread(img_path)
+                h, w, _ = img.shape
+                boxes = yolo_parser(lbl_path)
+                for nb in boxes:
+                    box = nb['bbox']
+                    size = int(box[2] * box[3] * w * h)
+                    if size not in size_cnt_map:
+                        size_cnt_map[size] = 0
+                    size_cnt_map[size] += 1
+                    sizes.append(size)
+                    bw = int(box[2] * w)
+                    bh = int(box[3] * h)
+                    hw_pair.append((bh, bw))
+        elif box_format == 'obb':
+            for img in imgs:
+                img_path = fr'{img_root}/{img}'
+                lbl_path = fr'{lbl_root}/{img.replace("jpg", "txt")}'
+                img = cv2.imread(img_path)
+                h, w, _ = img.shape
+                boxes = yolo_obb_parser(lbl_path)
+                for nb in boxes:
+                    box = nb['obb']
+                    size = int(box[-1] * box[-2] * w * h)
+                    if size not in size_cnt_map:
+                        size_cnt_map[size] = 0
+                    size_cnt_map[size] += 1
+                    sizes.append(size)
+                    bw = int(box[2] * w)
+                    bh = int(box[3] * h)
+                    hw_pair.append((bh, bw))
+        else:
+            raise ValueError(f'box_format {box_format} not supported')
         return sizes, size_cnt_map, hw_pair
 
     has_train = 'train' in os.listdir(f'{yolo_root}/images') and 'train' in os.listdir(f'{yolo_root}/labels')
