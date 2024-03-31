@@ -10,7 +10,7 @@ import os
 from typing import Union
 
 import cv2
-from format import yolo_parser, coco_parser, yolo_obb_parser
+from .format import yolo_parser, coco_parser, yolo_obb_parser
 from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from collections import Counter
