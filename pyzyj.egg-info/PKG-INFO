@@ -1,12 +1,20 @@
 Metadata-Version: 2.1
 Name: pyzyj
-Version: 1.0
+Version: 1.0.1
 Description-Content-Type: text/markdown
 License-File: LICENSE
 
-<center><font size=7><b>ZYJ's own python tools.</b></font></center>
+<center><font size=7><b>PyZYJ</b></font></center>
+ZYJ's own python tools.
+
+[![PyPI version](https://badge.fury.io/py/pyzyj.svg)](https://badge.fury.io/py/pyzyj)
+[![GitHub license](https://img.shields.io/github/license/ZYJIQVV/pyzyj)](https://img.shields.io/github/license/ZYJIQVV/pyzyj)
+
+[//]: # ([![GitHub version]&#40;https://badge.fury.io/gh/ZYJIQVV%2Fpyzyj.svg&#41;]&#40;https://badge.fury.io/gh/ZYJIQVV%2Fpyzyj&#41;)
 
 Version 1.0 Official Release
+
+[Source Code Access on GitHub](https://github.com/ZYJIQVV/pyzyj)
 
 This is a collection of Python tools I have written for my own work.
 I have decided to publish it as a package on PyPI and GitHub so that it can be installed and used in any of my projects.

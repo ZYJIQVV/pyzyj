@@ -13,3 +13,7 @@ pyzyj.egg-info/PKG-INFO
 pyzyj.egg-info/SOURCES.txt
 pyzyj.egg-info/dependency_links.txt
 pyzyj.egg-info/top_level.txt
+pyzyj/torchmemutilsmaster/__init__.py
+pyzyj/torchmemutilsmaster/gpu_mem_track.py
+pyzyj/torchmemutilsmaster/modelsize_estimate.py
+pyzyj/torchmemutilsmaster/tensor_mem.py
