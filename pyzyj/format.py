@@ -8,6 +8,7 @@
 """
 
 import json
+import math
 import os
 
 import cv2
@@ -144,6 +145,58 @@ def yolo_parser(yolo_path, img_w=None, img_h=None):
                 bboxes.append({'name': cat, 'bbox': [xmin, ymin, xmax, ymax]})
             else:
                 bboxes.append({'name': cat, 'bbox': [cx, cy, w, h]})
+    return bboxes
+
+def yolo_obb_parser(yolo_path, img_w=None, img_h=None):
+    """
+    return bboxes [{'name':name,'bbox':[xmin,ymin,xmax,ymax]},...] or [{'name':name,'bbox':[cx,cy,w,h]},...]
+    :param yolo_path:
+    :param img_w: image width
+    :param img_h: image height
+    if img_w and img_h are not None, the bbox will be scaled to the original image size,
+    otherwise the bbox is the relative size
+    :return:
+    """
+    bboxes = []
+    with open(yolo_path, 'r') as f:
+        for line in f.readlines():
+            line = line.strip()
+            if line == '':
+                continue
+            cat, xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb = line.split(' ')
+            cat = int(cat)
+            xlt = float(xlt)
+            ylt = float(ylt)
+            xrt = float(xrt)
+            yrt = float(yrt)
+            xrb = float(xrb)
+            yrb = float(yrb)
+            xlb = float(xlb)
+            ylb = float(ylb)
+            obbw = math.sqrt((xlt - xrt) ** 2 + (ylt - yrt) ** 2)
+            obbh = math.sqrt((xlt - xlb) ** 2 + (ylt - ylb) ** 2)
+            # calculate the minimum bounding rectangle
+            brw = max(xlt, xrt, xrb, xlb) - min(xlt, xrt, xrb, xlb)
+            brh = max(ylt, yrt, yrb, ylb) - min(ylt, yrt, yrb, ylb)
+            brcx = (xlt + xrt + xrb + xlb) / 4
+            brcy = (ylt + yrt + yrb + ylb) / 4
+            if img_w and img_h:
+                brxmin = int((brcx - brw / 2) * img_w)
+                brymin = int((brcy - brh / 2) * img_h)
+                brxmax = int((brcx + brw / 2) * img_w)
+                brymax = int((brcy + brh / 2) * img_h)
+                xlt = int(xlt * img_w)
+                ylt = int(ylt * img_h)
+                xrt = int(xrt * img_w)
+                yrt = int(yrt * img_h)
+                xrb = int(xrb * img_w)
+                yrb = int(yrb * img_h)
+                xlb = int(xlb * img_w)
+                ylb = int(ylb * img_h)
+                bboxes.append({'name': cat, 'br': [brxmin, brymin, brxmax, brymax], 'obb': [xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, obbw, obbh]})
+            else:
+                bboxes.append({'name': cat, 'br': [brcx, brcy, brw, brh], 'obb': [xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, obbw, obbh]})
+
     return bboxes
 
 
