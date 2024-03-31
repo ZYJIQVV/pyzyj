@@ -183,7 +183,7 @@ def cal_tgt_size_dist(*,res='c', yolo_root=None, coco_root=None, format='yolo',s
 
 
 def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
-                filename='heatmap.png', threshold: Union[list, tuple, int, float] = 100,s=None):
+                filename='heatmap.png', threshold: Union[list, tuple, int, float] = None,s=None):
     """
     :param base: If base is not None, the width and height will be rounded
     to the maximum multiple of base less than the original width and height
@@ -220,7 +220,8 @@ def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
     fig = plt.figure()
     counter = dict(Counter(hw_pair))
     for k, v in counter.items():
-        if k[0] > h_threshold or k[1] > w_threshold:
+
+        if threshold is not None and k[0] > h_threshold or k[1] > w_threshold:
             continue
         hs.append(k[0])
         ws.append(k[1])
