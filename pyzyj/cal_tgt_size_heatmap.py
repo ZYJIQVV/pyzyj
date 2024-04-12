@@ -226,9 +226,11 @@ def gen_heatmap(*, res='a', base=None,yolo_root=None, coco_root=None,
         hs.append(k[0])
         ws.append(k[1])
     heat_map_data = []
-    for i in range(100):
+    max_w = max(ws)
+    max_h = max(hs)
+    for i in range(max_h):
         heat_map_data.append([])
-        for j in range(100):
+        for j in range(max_w):
             if (i, j) in counter:
                 heat_map_data[i].append(counter[(i, j)])
             else:

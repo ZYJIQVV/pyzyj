@@ -93,6 +93,59 @@ def yolo_to_coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0,
         {'images': images, 'annotations': annotations, 'categories': categories, 'info': info, 'licenses': licenses}))
     ann_file.close()
 
+def yolo_to_coco_n(yolo_root, json_path, categories, n, img_id=0, ann_id=0, info='', licenses=''):
+    """
+
+    :param yolo_root:
+    :param json_path:
+    :param categories:
+    :param n: train, val or test to specify which sub-dataset to transfer
+    :param img_id:
+    :param ann_id:
+    :param info:
+    :param licenses:
+    :return:
+    """
+    img_root = os.path.join(yolo_root, 'images', n)
+    lbl_root = os.path.join(yolo_root, 'labels', n)
+    files = os.listdir(lbl_root)
+    ann_file = open(json_path, 'w')
+    images = []
+    annotations = []
+    for file in files:
+        if file.endswith('.txt'):
+            img_id += 1
+            img_name = file.split('.')[0] + '.jpg'
+            img_file = os.path.join(img_root, img_name)
+            img = cv2.imread(img_file)
+            height, width, _ = img.shape
+            img = {'file_name': img_name, 'height': height, 'width': width, 'id': img_id}
+            images.append(img)
+            txt_path = os.path.join(lbl_root, file)
+            with open(txt_path, 'r') as f:
+                for line in f.readlines():
+                    line = line.strip()
+                    if line == '':
+                        continue
+                    cat, x, y, w, h = line.split(' ')
+                    x = float(x)
+                    y = float(y)
+                    w = float(w)
+                    h = float(h)
+                    x *= width
+                    y *= height
+                    w *= width
+                    h *= height
+                    xmin = int(x - w / 2)
+                    ymin = int(y - h / 2)
+                    cat = int(cat)
+                    bbox = [xmin, ymin, w, h]
+                    ann_id += 1
+                    ann = {'id': ann_id, 'image_id': img_id, 'category_id': cat, 'bbox': bbox}
+                    annotations.append(ann)
+    ann_file.write(json.dumps(
+        {'images': images, 'annotations': annotations, 'categories': categories, 'info': info, 'licenses': licenses}))
+    ann_file.close()
 
 def coco_parser(ann_path):
     '''
