@@ -14,7 +14,7 @@ import os
 import cv2
 
 
-def coco_to_yolo(json_path, yolo_root, cat_reid=False):
+def coco2yolo(json_path, yolo_root, cat_reid=False):
     ann_file = json.load(open(json_path, 'r'))
     images = ann_file['images']
     annotations = ann_file['annotations']
@@ -53,7 +53,7 @@ def coco_to_yolo(json_path, yolo_root, cat_reid=False):
                 f.write(str(cat_id) + ' ' + str(x_center) + ' ' + str(y_center) + ' ' + str(w) + ' ' + str(h) + '\n')
 
 
-def yolo_to_coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, info='', licenses=''):
+def yolo2coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, info='', licenses=''):
     ann_file = open(json_path, 'w')
     images = []
     annotations = []
@@ -93,7 +93,7 @@ def yolo_to_coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0,
         {'images': images, 'annotations': annotations, 'categories': categories, 'info': info, 'licenses': licenses}))
     ann_file.close()
 
-def yolo_to_coco_n(yolo_root, json_path, categories, n, img_id=0, ann_id=0, info='', licenses=''):
+def yolo2coco_n(yolo_root, json_path, categories, n, img_id=0, ann_id=0, info='', licenses=''):
     """
 
     :param yolo_root:
@@ -320,7 +320,7 @@ def xml_parser_obb(ann_path):
             bboxes.append({'name': name, 'bbox': [tlx, tly, trx, try_, brx, bry, blx, bly, obbw, obbh]})
     return bboxes
 
-def xml_to_yolo(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
+def xml2yolo(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
     """
     convert the xml annotation to yolo format
     :param xml_root:
@@ -348,7 +348,7 @@ def xml_to_yolo(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
 
 
 
-def tif_to_jpg(tif_root, jpg_root):
+def tif2jpg(tif_root, jpg_root):
     from PIL import Image
     for root, dirs, files in os.walk(tif_root):
         for file in files:
