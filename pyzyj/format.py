@@ -246,9 +246,11 @@ def yolo_obb_parser(yolo_path, img_w=None, img_h=None):
                 yrb = int(yrb * img_h)
                 xlb = int(xlb * img_w)
                 ylb = int(ylb * img_h)
-                bboxes.append({'name': cat, 'br': [brxmin, brymin, brxmax, brymax], 'obb': [xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, obbw, obbh]})
+                obbw = int(obbw * img_w)
+                obbh = int(obbh * img_h)
+                bboxes.append({'name': cat, 'br': [brxmin, brymin, brxmax, brymax], 'bbox': [xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, obbw, obbh]})
             else:
-                bboxes.append({'name': cat, 'br': [brcx, brcy, brw, brh], 'obb': [xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, obbw, obbh]})
+                bboxes.append({'name': cat, 'br': [brcx, brcy, brw, brh], 'bbox': [xlt, ylt, xrt, yrt, xrb, yrb, xlb, ylb, obbw, obbh]})
 
     return bboxes
 
@@ -264,6 +266,11 @@ def xml_parser(ann_path):
     root = tree.documentElement
     objects = root.getElementsByTagName('object')
     bboxes = []
+    size = root.getElementsByTagName('size')
+    H = size.getElementsByTagName('height')[0].data
+    W = size.getElementsByTagName('width')[0].data
+    H = float(H)
+    W = float(W)
     for object in objects:
         name = object.getElementsByTagName('name')[0].childNodes[0].data
         bndboxes = object.getElementsByTagName('bndbox')
@@ -273,4 +280,81 @@ def xml_parser(ann_path):
             xmax = int(bndbox.getElementsByTagName('xmax')[0].childNodes[0].data)
             ymax = int(bndbox.getElementsByTagName('ymax')[0].childNodes[0].data)
             bboxes.append({'name': name, 'bbox': [xmin, ymin, xmax, ymax]})
+    return bboxes, H, W
+
+def xml_parser_obb(ann_path):
+    '''
+    return bboxes [{'name':name,'bbox':[tlx, tly, trx, try, brx, bry, blx, bly, obbw, obbh]},...]
+    :param ann_path:
+    :return:
+    '''
+    from xml.dom import minidom
+    tree = minidom.parse(ann_path)
+    root = tree.documentElement
+    objects = root.getElementsByTagName('object')
+    bboxes = []
+    witdh = int(root.getElementsByTagName('width')[0].childNodes[0].data)
+    height = int(root.getElementsByTagName('height')[0].childNodes[0].data)
+    for object in objects:
+        name = object.getElementsByTagName('name')[0].childNodes[0].data
+        points = object.getElementsByTagName('points')
+        for point in points:
+            tlx = float(point.getElementsByTagName('point')[1].childNodes[0].data.split(',')[0])
+            tly = float(point.getElementsByTagName('point')[1].childNodes[0].data.split(',')[1])
+            trx = float(point.getElementsByTagName('point')[2].childNodes[0].data.split(',')[0])
+            try_ = float(point.getElementsByTagName('point')[2].childNodes[0].data.split(',')[1])
+            brx = float(point.getElementsByTagName('point')[3].childNodes[0].data.split(',')[0])
+            bry = float(point.getElementsByTagName('point')[3].childNodes[0].data.split(',')[1])
+            blx = float(point.getElementsByTagName('point')[4].childNodes[0].data.split(',')[0])
+            bly = float(point.getElementsByTagName('point')[4].childNodes[0].data.split(',')[1])
+            obbw = math.sqrt((tlx - trx) ** 2 + (tly - try_) ** 2)
+            obbh = math.sqrt((tlx - blx) ** 2 + (tly - bly) ** 2)
+            tlx /= witdh
+            tly /= height
+            trx /= witdh
+            try_ /= height
+            brx /= witdh
+            bry /= height
+            blx /= witdh
+            bly /= height
+            bboxes.append({'name': name, 'bbox': [tlx, tly, trx, try_, brx, bry, blx, bly, obbw, obbh]})
     return bboxes
+
+def xml_to_yolo(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
+    """
+    convert the xml annotation to yolo format
+    :param xml_root:
+    :param yolo_root:
+    :return:
+    """
+    if name_catid is None:
+        name_catid = {}
+    for root, dirs, files in os.walk(xml_root):
+        for file in files:
+            if file.endswith('.xml'):
+                xml_path = os.path.join(root, file)
+                obbs = xml_parser(xml_path)
+                with open(os.path.join(yolo_root, 'labels', file.split('.')[0] + '.txt'), 'w') as f:
+                    for obb in obbs:
+                        name = obb['name']
+                        if name not in name_catid:
+                            name_catid[name] = len(name_catid)
+                        cat = name_catid[name]
+                        bbox = obb['bbox']
+                        if len(bbox) > 8:
+                            bbox = bbox[:8]
+                        bbox = ' '.join([str(b) for b in bbox])
+                        f.write(str(cat) + ' ' + bbox + '\n')
+
+
+
+def tif_to_jpg(tif_root, jpg_root):
+    from PIL import Image
+    for root, dirs, files in os.walk(tif_root):
+        for file in files:
+            if file.endswith('.tif'):
+                tif_path = os.path.join(root, file)
+                img = Image.open(tif_path)
+                img = img.convert('RGB')
+                img.save(os.path.join(jpg_root, file.split('.')[0] + '.jpg'))
+

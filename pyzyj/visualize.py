@@ -132,3 +132,27 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
             cv2.waitKey(0)
     else:
         raise Exception('Image not found')
+
+
+import cv2
+import numpy as np
+
+
+def draw_obb(image, obb_points, color=(0, 255, 0), thickness=2):
+    """
+    Draw oriented bounding box (OBB) on the image.
+
+    Parameters:
+        image (numpy.ndarray): Input image.
+        obb_points (list): List of eight coordinates representing the OBB box.
+        color (tuple): Color of the OBB box in BGR format.
+        thickness (int): Thickness of the lines used to draw the OBB box.
+
+    Returns:
+        numpy.ndarray: Image with the OBB box drawn.
+    """
+    obb_points = np.array(obb_points, dtype=np.int32).reshape((-1, 1, 2))
+    cv2.polylines(image, [obb_points], isClosed=True, color=color, thickness=thickness)
+    return image
+
+
