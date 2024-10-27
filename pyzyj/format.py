@@ -53,7 +53,7 @@ def coco2yolo(json_path, yolo_root, cat_reid=False):
                 f.write(str(cat_id) + ' ' + str(x_center) + ' ' + str(y_center) + ' ' + str(w) + ' ' + str(h) + '\n')
 
 
-def yolo2coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, info='', licenses=''):
+def yolo2coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, info='', licenses='', img_suffix='.jpg'):
     ann_file = open(json_path, 'w')
     images = []
     annotations = []
@@ -61,8 +61,8 @@ def yolo2coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, in
         for file in files:
             if file.endswith('.txt'):
                 img_id += 1
-                img_name = file.split('.')[0] + '.jpg'
-                img_file = os.path.join(img_root, img_name)
+                img_name = file.split('.')[0] + img_suffix
+                img_file = fr'{img_root}\{img_name}'
                 img = cv2.imread(img_file)
                 height, width, _ = img.shape
                 img = {'file_name': img_name, 'height': height, 'width': width, 'id': img_id}
@@ -87,7 +87,7 @@ def yolo2coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, in
                         cat = int(cat)
                         bbox = [xmin, ymin, w, h]
                         ann_id += 1
-                        ann = {'id': ann_id, 'image_id': img_id, 'category_id': cat, 'bbox': bbox}
+                        ann = {'id': ann_id, 'image_id': img_id, 'category_id': cat, 'bbox': bbox, 'area': w * h, 'iscrowd': 0}
                         annotations.append(ann)
     ann_file.write(json.dumps(
         {'images': images, 'annotations': annotations, 'categories': categories, 'info': info, 'licenses': licenses}))
@@ -106,8 +106,10 @@ def yolo2coco_n(yolo_root, json_path, categories, n, img_id=0, ann_id=0, info=''
     :param licenses:
     :return:
     """
-    img_root = os.path.join(yolo_root, 'images', n)
-    lbl_root = os.path.join(yolo_root, 'labels', n)
+    # img_root = os.path.join(yolo_root, 'images', n)
+    img_root = fr'{yolo_root}\images\{n}'
+    # lbl_root = os.path.join(yolo_root, 'labels', n)
+    lbl_root = fr'{yolo_root}\labels\{n}'
     files = os.listdir(lbl_root)
     ann_file = open(json_path, 'w')
     images = []
@@ -141,7 +143,7 @@ def yolo2coco_n(yolo_root, json_path, categories, n, img_id=0, ann_id=0, info=''
                     cat = int(cat)
                     bbox = [xmin, ymin, w, h]
                     ann_id += 1
-                    ann = {'id': ann_id, 'image_id': img_id, 'category_id': cat, 'bbox': bbox}
+                    ann = {'id': ann_id, 'image_id': img_id, 'category_id': cat, 'bbox': bbox, 'area': h * w, 'iscrowd': 0}
                     annotations.append(ann)
     ann_file.write(json.dumps(
         {'images': images, 'annotations': annotations, 'categories': categories, 'info': info, 'licenses': licenses}))
