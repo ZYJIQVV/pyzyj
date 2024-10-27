@@ -15,7 +15,9 @@ import numpy as np
 from .format import xml_parser, yolo_parser
 from pycocotools.coco import COCO
 
-def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple = None, parser: callable = None, format: str='yolo') -> None:
+
+def visualize_one(img_path: str, ann_path: str, save_path: str = None, color: tuple = None, parser: callable = None,
+                  format: str = 'yolo', cats=None) -> None:
     """
     visualize the image with annotations, at present only support object detection with bbox
     :param img_path: the path of image
@@ -66,7 +68,7 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
                 ymax = int(ymax)
                 cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
         else:
-            bboxes = parser(img_path,ann_path)
+            bboxes = parser(img_path, ann_path)
             img = cv2.imread(img_path)
             if len(bboxes) == 0:
                 raise Exception('No bbox found in ann file')
@@ -77,6 +79,7 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
                 y = bbox[1]
                 w = bbox[2]
                 h = bbox[3]
+
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
     elif ann_path.endswith('.xml'):  # voc
         if parser is None:
@@ -101,8 +104,11 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
             if len(bboxes) == 0:
                 raise Exception('No bbox found in ann file')
             for bbox in bboxes:
+                name = bbox['name']
                 bbox = bbox['bbox']
                 xmin, ymin, xmax, ymax = bbox
+                name = str(name) if cats is None else cats[name]
+                cv2.putText(img, name, (xmin, ymin), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
                 cv2.rectangle(img, (xmin, ymin), (xmax, ymax), color, 2)
 
         elif format == 'custom':
@@ -121,7 +127,7 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
                 h = bbox[3]
                 cv2.rectangle(img, (x, y), (x + w, y + h), color, 2)
     else:
-        raise Exception('Annotation file not supported')
+        raise Exception('Annotation file not supported: {}'.format(ann_path))
     if img is not None:
         if save_path is not None:
             if os.path.isdir(save_path):
@@ -134,8 +140,21 @@ def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple 
         raise Exception('Image not found')
 
 
-import cv2
-import numpy as np
+def visualize(img_path: str, ann_path: str, save_path: str = None, color: tuple = None, parser: callable = None,
+              format: str = 'yolo', cats=None) -> None:
+    if not os.path.isdir(img_path):
+        visualize_one(img_path, ann_path, save_path, color, parser, format, cats=cats)
+    else:
+        if not os.path.isdir(save_path):
+            os.makedirs(save_path)
+        for root, dirs, files in os.walk(img_path):
+            for file in files:
+                img = os.path.join(root, file)
+                ann = os.path.join(ann_path, os.path.splitext(file)[0] + '.txt')
+                sv_path = fr'{save_path}/{file}' if save_path is not None else None
+                visualize_one(img, ann, sv_path, color, parser, format, cats=cats)
+
+
 
 
 def draw_obb(image, obb_points, color=(0, 255, 0), thickness=2):

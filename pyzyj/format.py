@@ -51,7 +51,14 @@ def coco2yolo(json_path, yolo_root, cat_reid=False):
                 w /= img_width
                 h /= img_height
                 f.write(str(cat_id) + ' ' + str(x_center) + ' ' + str(y_center) + ' ' + str(w) + ' ' + str(h) + '\n')
-
+    # write the name_catid to a file
+    with open(os.path.join(yolo_root, 'name_catid.txt'), 'w') as f:
+        if cat_reid:
+            # replace the cat_id with the reid
+            for cat in categories:
+                cat['id'] = categories_reid.index(cat['id'])
+        for name, cat in categories.items():
+            f.write(name + ' ' + str(cat) + '\n')
 
 def yolo2coco(yolo_root, json_path, categories, img_root, img_id=0, ann_id=0, info='', licenses='', img_suffix='.jpg'):
     ann_file = open(json_path, 'w')
@@ -338,19 +345,30 @@ def xml2yolo(xml_root, yolo_root, xml_parser=xml_parser, name_catid=None):
                 bboxes, H, W = xml_parser(xml_path)
                 with open(os.path.join(yolo_root, 'labels', file.split('.')[0] + '.txt'), 'w') as f:
                     for bbox in bboxes:
-                        name = obb['name']
+                        name = bbox['name']
                         if name not in name_catid:
                             name_catid[name] = len(name_catid)
                         cat = name_catid[name]
-                        bbox = obb['bbox']
+                        bbox = bbox['bbox']
                         if len(bbox) > 4:
                             raise 'Invalid bbox format'
                         bbox[0] = bbox[0] / W
                         bbox[1] = bbox[1] / H
                         bbox[2] = bbox[2] / W
                         bbox[3] = bbox[3] / H
+                        w = bbox[2] - bbox[0]
+                        h = bbox[3] - bbox[1]
+                        bbox[0] = bbox[0] + w / 2
+                        bbox[1] = bbox[1] + h / 2
+                        bbox[2] = w
+                        bbox[3] = h
+                        bbox = ' '.join([str(b) for b in bbox])
                         bbox = ' '.join([str(b) for b in bbox])
                         f.write(str(cat) + ' ' + bbox + '\n')
+    # write the name_catid to a file
+    with open(os.path.join(yolo_root, 'name_catid.txt'), 'w') as f:
+        for name, cat in name_catid.items():
+            f.write(name + ' ' + str(cat) + '\n')
 
 def xml2yolo_obb(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
     """
@@ -377,6 +395,10 @@ def xml2yolo_obb(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None)
                             bbox = bbox[:8]
                         bbox = ' '.join([str(b) for b in bbox])
                         f.write(str(cat) + ' ' + bbox + '\n')
+    # write the name_catid to a file
+    with open(os.path.join(yolo_root, 'name_catid.txt'), 'w') as f:
+        for name, cat in name_catid.items():
+            f.write(name + ' ' + str(cat) + '\n')
 
 
 
