@@ -322,7 +322,7 @@ def xml_parser_obb(ann_path):
             bboxes.append({'name': name, 'bbox': [tlx, tly, trx, try_, brx, bry, blx, bly, obbw, obbh]})
     return bboxes
 
-def xml2yolo(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
+def xml2yolo(xml_root, yolo_root, xml_parser=xml_parser,name_catid=None):
     """
     convert the xml annotation to yolo format
     :param xml_root:
