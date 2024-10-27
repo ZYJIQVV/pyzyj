@@ -17,12 +17,12 @@ if args.version:
     version = args.version
 else:
     raise ValueError('the version of the package to release must be specified')
+
 repository = args.repository
 cmds =['python -m pip install --upgrade build',
        'python -m build',
        'python -m pip install --upgrade twine',
        f'python -m twine upload --repository {repository} dist/pyzyj-{version}.tar.gz',
-
        ]
 for cmd in cmds:
     os.system(cmd)

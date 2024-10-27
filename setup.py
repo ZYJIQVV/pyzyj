@@ -11,10 +11,13 @@ from setuptools import setup, find_packages
 setup(
     name='pyzyj',
     version='1.0.2',
+    author='zyj',
+    author_email='',
     packages=find_packages(),
     install_requires=[
         # list your project dependencies here
     ],
     long_description=open('README.md').read(),
     long_description_content_type='text/markdown',
+    url='https://github.com/ZYJIQVV/pyzyj',
 )

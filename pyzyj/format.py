@@ -322,7 +322,37 @@ def xml_parser_obb(ann_path):
             bboxes.append({'name': name, 'bbox': [tlx, tly, trx, try_, brx, bry, blx, bly, obbw, obbh]})
     return bboxes
 
-def xml2yolo(xml_root, yolo_root, xml_parser=xml_parser,name_catid=None):
+def xml2yolo(xml_root, yolo_root, xml_parser=xml_parser, name_catid=None):
+    """
+    convert the xml annotation to yolo format
+    :param xml_root:
+    :param yolo_root:
+    :return:
+    """
+    if name_catid is None:
+        name_catid = {}
+    for root, dirs, files in os.walk(xml_root):
+        for file in files:
+            if file.endswith('.xml'):
+                xml_path = os.path.join(root, file)
+                bboxes, H, W = xml_parser(xml_path)
+                with open(os.path.join(yolo_root, 'labels', file.split('.')[0] + '.txt'), 'w') as f:
+                    for bbox in bboxes:
+                        name = obb['name']
+                        if name not in name_catid:
+                            name_catid[name] = len(name_catid)
+                        cat = name_catid[name]
+                        bbox = obb['bbox']
+                        if len(bbox) > 4:
+                            raise 'Invalid bbox format'
+                        bbox[0] = bbox[0] / W
+                        bbox[1] = bbox[1] / H
+                        bbox[2] = bbox[2] / W
+                        bbox[3] = bbox[3] / H
+                        bbox = ' '.join([str(b) for b in bbox])
+                        f.write(str(cat) + ' ' + bbox + '\n')
+
+def xml2yolo_obb(xml_root, yolo_root, xml_parser=xml_parser_obb,name_catid=None):
     """
     convert the xml annotation to yolo format
     :param xml_root:
