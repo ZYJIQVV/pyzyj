@@ -1,0 +1,7 @@
+path: /data/D/zyj/datasets/H_All_Add_F_ZC_Data_copypaste_split_Other_datasets/little-dataset
+train: images
+val: images
+
+names:
+  0: ship
+  1: plane
