@@ -189,6 +189,7 @@ class BaseValidator:
 
             bboxs = []
             preds = []
+            gts = []
             for idx, pd_f in enumerate(pred_file):
                 try:
                     with open(pd_f, 'r') as f:
@@ -197,6 +198,7 @@ class BaseValidator:
                     lines = []
                 lines = [list(map(float,line.strip().split())) for line in lines]
                 lines = [[(line[1] - line[3] / 2) * HW[idx][1], (line[2] - line[4] / 2) * HW[idx][0], (line[1] + line[3] / 2) * HW[idx][1], (line[2] + line[4] / 2) * HW[idx][0], line[5], line[0]] for line in lines]
+                # lines = [[(line[1] - line[3] / 2) * HW[idx][1], (line[2] - line[4] / 2) * HW[idx][0], (line[1] * 2) * HW[idx][1], (line[2] * 2) * HW[idx][0], line[5], line[0]] for line in lines]
                 preds.append(list(lines))
             preds = [torch.tensor(pred, device=self.device) for pred in preds]
             preds = [pred if pred.shape[0]>0 else pred.reshape(0,0) for pred in preds]
@@ -211,14 +213,29 @@ class BaseValidator:
                 lines = list(set(lines))
                 lines = [list(map(float, line.strip().split())) for line in lines]
                 lines = [
-                    [(line[1] - line[3] / 2) * HW[idx][1],
+                    [
+                     line[0],
+                     (line[1] - line[3] / 2) * HW[idx][1],
                      (line[2] - line[4] / 2) * HW[idx][0],
                      (line[1] + line[3] / 2) * HW[idx][1],
                      (line[2] + line[4] / 2) * HW[idx][0]
                      ] for line in lines]
-                bboxs.append(list(lines))
+                # lines = [
+                #     [
+                #      line[0],
+                #      (line[1] - line[3] / 2) * HW[idx][1],
+                #      (line[2] - line[4] / 2) * HW[idx][0],
+                #      (line[1] * 2) * HW[idx][1],
+                #      (line[2] * 2) * HW[idx][0]
+                #      ] for line in lines]
+                bbox = [[line[1], line[2], line[3], line[4]] for line in lines]
+                cls = [[line[0]] for line in lines]
+                bboxs.append(list(bbox))
+                gts.append(cls)
             bboxs = torch.cat([torch.tensor(bbox, device=self.device) for bbox in bboxs])
+            gts = torch.cat([torch.tensor(gt, device=self.device) for gt in gts])
             batch['bboxes'] = bboxs
+            batch['cls'] = gts
             # Preprocess
             # with dt[0]:
             #     batch = self.preprocess(batch)
