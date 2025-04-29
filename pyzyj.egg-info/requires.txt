@@ -3,7 +3,6 @@ numpy
 Pillow
 pycocotools
 lxml
-torch
 torchvision
 tqdm
 matplotlib

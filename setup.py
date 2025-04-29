@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyzyj',
-    version='1.1.0',
+    version='1.1.1',
     author='zyj',
     author_email='',
     packages=find_packages(),
@@ -20,8 +20,8 @@ setup(
         'Pillow',
         'pycocotools',
         'lxml',
-        'torch',
-        'torchvision',
+        # 'torch',
+        # 'torchvision',
         'tqdm',
         'matplotlib',
         'scikit-image',

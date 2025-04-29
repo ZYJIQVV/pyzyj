@@ -16,14 +16,19 @@ args = parser.parse_args()
 if args.version:
     version = args.version
 else:
+    found = False
     try:
         with open('setup.py', 'r') as f:
             for line in f:
                 if 'version' in line:
                     version = line.split('=')[1].strip().replace("'",'').replace('"','').replace(',','')
+                    found = True
                     break
     except:
         raise ValueError('the version of the package to release must be specified or setup.py must be in the current directory')
+    finally:
+        if not found:
+            raise ValueError('the version of the package to release must be specified or setup.py must be in the current directory')
 
 repository = args.repository
 cmds =['python -m pip install --upgrade build',
