@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyzyj',
-    version='1.1.4',
+    version='1.1.5',
     author='zyj',
     author_email='',
     packages=find_packages(),
