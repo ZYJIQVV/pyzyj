@@ -10,7 +10,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pyzyj',
-    version='1.1.1',
+    version='1.1.4',
     author='zyj',
     author_email='',
     packages=find_packages(),
@@ -29,7 +29,7 @@ setup(
         'pandas',
         'pyyaml',
     ],
-    long_description=open('README.md').read(),
+    long_description=open('README.md', encoding='utf-8').read(),
     long_description_content_type='text/markdown',
     url='https://github.com/ZYJIQVV/pyzyj',
     license='MIT',

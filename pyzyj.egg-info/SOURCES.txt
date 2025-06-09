@@ -8,6 +8,7 @@ pyzyj/count_by_class.py
 pyzyj/download.py
 pyzyj/evaluate.py
 pyzyj/format.py
+pyzyj/logger.py
 pyzyj/select_tools.py
 pyzyj/tiny_copy.py
 pyzyj/train_val_divide.py

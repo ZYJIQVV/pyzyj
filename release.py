@@ -32,9 +32,11 @@ else:
 
 repository = args.repository
 cmds =['python -m pip install --upgrade build',
-       'python -m build',
        'python -m pip install --upgrade twine',
+       'python -m pip install --upgrade packaging',
+       'python -m build',
        f'python -m twine upload --repository {repository} dist/pyzyj-{version}.tar.gz',
+       f'python -m twine upload --repository {repository} dist/pyzyj-{version}-py3-none-any.whl',
        ]
 for cmd in cmds:
     os.system(cmd)

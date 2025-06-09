@@ -1,6 +1,6 @@
-Metadata-Version: 2.2
+Metadata-Version: 2.4
 Name: pyzyj
-Version: 1.1.1
+Version: 1.1.4
 Home-page: https://github.com/ZYJIQVV/pyzyj
 Author: zyj
 Author-email: 
@@ -12,7 +12,6 @@ Requires-Dist: numpy
 Requires-Dist: Pillow
 Requires-Dist: pycocotools
 Requires-Dist: lxml
-Requires-Dist: torchvision
 Requires-Dist: tqdm
 Requires-Dist: matplotlib
 Requires-Dist: scikit-image
@@ -24,6 +23,7 @@ Dynamic: description
 Dynamic: description-content-type
 Dynamic: home-page
 Dynamic: license
+Dynamic: license-file
 Dynamic: requires-dist
 
 <center><font size=7><b>PyZYJ</b></font></center>
