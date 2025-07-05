@@ -6,7 +6,7 @@ ZYJ's <b>OWN</b> python tools.
 
 [//]: # ([![GitHub version]&#40;https://badge.fury.io/gh/ZYJIQVV%2Fpyzyj.svg&#41;]&#40;https://badge.fury.io/gh/ZYJIQVV%2Fpyzyj&#41;)
 
-Version `1.1.0` Release
+Version `1.1.5` Release
 
 [Source Code Available on GitHub](https://github.com/ZYJIQVV/pyzyj)
 
