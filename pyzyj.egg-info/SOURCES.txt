@@ -4,6 +4,7 @@ setup.cfg
 setup.py
 pyzyj/__init__.py
 pyzyj/cal_tgt_size_heatmap.py
+pyzyj/check_file_difference.py
 pyzyj/count_by_class.py
 pyzyj/download.py
 pyzyj/evaluate.py
