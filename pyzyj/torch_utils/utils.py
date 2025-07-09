@@ -27,8 +27,8 @@ def compare_models(model1, model2, state_dict_map=None):
 
     if state_dict_map is None:
         state_dict_map = {key: key for key in sd1.keys()}
-    elif sd1.keys() != sd2.keys():
-        return False
+    # elif sd1.keys() != sd2.keys():
+    #     return False
 
     for key in sd1.keys():
         if not torch.equal(sd1[key], sd2[state_dict_map[key]]):
