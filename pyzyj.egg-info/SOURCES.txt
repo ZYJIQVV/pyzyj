@@ -24,6 +24,8 @@ pyzyj/shutup/__init__.py
 pyzyj/shutup/shutup/__init__.py
 pyzyj/shutup/tests/__init__.py
 pyzyj/shutup/tests/test_shutup.py
+pyzyj/torch_utils/__init__.py
+pyzyj/torch_utils/utils.py
 pyzyj/torchutils/__init__.py
 pyzyj/torchutils/model_size.py
 pyzyj/yolo_evaluator/__init__.py
